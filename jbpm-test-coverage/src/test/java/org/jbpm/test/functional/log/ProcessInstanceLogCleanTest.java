@@ -16,18 +16,15 @@
 
 package org.jbpm.test.functional.log;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.assertj.core.api.Assertions;
 import org.jbpm.process.audit.JPAAuditLogService;
 import org.jbpm.test.JbpmTestCase;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.manager.audit.ProcessInstanceLog;
 import org.kie.api.runtime.process.ProcessInstance;
@@ -40,7 +37,13 @@ import qa.tools.ikeeper.annotation.BZ;
  * - try end dates.
  * - try initiator
  */
+@RunWith(Parameterized.class)
 public class ProcessInstanceLogCleanTest extends JbpmTestCase {
+
+    @Parameterized.Parameters
+    public static List<Object[]> data() {
+        return Arrays.asList(new Object[25][0]);
+    }
 
     private static final String HELLO_WORLD_PROCESS =
             "org/jbpm/test/functional/common/HelloWorldProcess1.bpmn";
@@ -244,6 +247,8 @@ public class ProcessInstanceLogCleanTest extends JbpmTestCase {
         // Delete the last 3 logs in the list
         resultList.stream().skip(1).forEach(s -> startDates.add(s.getStart()));
 
+        int startDatesCount = startDates.size();
+
         int resultCount = startDates.stream().map(
                           s ->  auditService.processInstanceLogDelete()
                                 .startDate(s)
@@ -251,7 +256,7 @@ public class ProcessInstanceLogCleanTest extends JbpmTestCase {
                                 .execute())
                           .collect(Collectors.summingInt(Integer::intValue));
 
-        Assertions.assertThat(resultCount).isEqualTo(3);
+        Assertions.assertThat(resultCount).isEqualTo(startDatesCount);
 
         // Attempt to delete with a date later than end of all the instances
         resultCount = auditService.processInstanceLogDelete()
@@ -265,7 +270,7 @@ public class ProcessInstanceLogCleanTest extends JbpmTestCase {
                 .startDateRangeStart(testStartDate)
                 .build()
                 .getResultList();
-        Assertions.assertThat(resultList2).hasSize(1);
+        Assertions.assertThat(resultList2).hasSize(4-startDatesCount);
         Assertions.assertThat(resultList2.get(0)).isEqualTo(resultList.get(0));
     }
 
