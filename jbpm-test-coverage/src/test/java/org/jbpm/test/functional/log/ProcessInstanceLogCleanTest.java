@@ -16,7 +16,13 @@
 
 package org.jbpm.test.functional.log;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.assertj.core.api.Assertions;
@@ -256,7 +262,19 @@ public class ProcessInstanceLogCleanTest extends JbpmTestCase {
                                 .execute())
                           .collect(Collectors.summingInt(Integer::intValue));
 
-        Assertions.assertThat(resultCount).isEqualTo(startDatesCount);
+        if (startDatesCount == 1) {
+            Assertions.assertThat(resultCount).isEqualTo(4);
+        } else {
+            Assertions.assertThat(resultCount).isEqualTo(3);
+
+            // Check the last instance
+            List<ProcessInstanceLog> resultList2 = auditService.processInstanceLogQuery()
+                    .startDateRangeStart(testStartDate)
+                    .build()
+                    .getResultList();
+            Assertions.assertThat(resultList2).hasSize(1);
+            Assertions.assertThat(resultList2.get(0)).isEqualTo(resultList.get(0));
+        }
 
         // Attempt to delete with a date later than end of all the instances
         resultCount = auditService.processInstanceLogDelete()
@@ -264,14 +282,6 @@ public class ProcessInstanceLogCleanTest extends JbpmTestCase {
                 .build()
                 .execute();
         Assertions.assertThat(resultCount).isEqualTo(0);
-
-        // Check the last instance
-        List<ProcessInstanceLog> resultList2 = auditService.processInstanceLogQuery()
-                .startDateRangeStart(testStartDate)
-                .build()
-                .getResultList();
-        Assertions.assertThat(resultList2).hasSize(4-startDatesCount);
-        Assertions.assertThat(resultList2.get(0)).isEqualTo(resultList.get(0));
     }
 
     @Test
