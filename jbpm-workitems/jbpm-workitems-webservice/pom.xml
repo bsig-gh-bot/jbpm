@@ -144,6 +144,7 @@
             <arg>-AwidsResources=${project.artifactId}.wid:widtemplate.st</arg>
             <arg>-AtemplateResources=kie-deployment-descriptor.xml:kie-ddtemplate.st,serviceinfo.json:serviceinfo.st,repoindex.html:repoindex.part,index.html:indextemplate.st,${project.artifactId}.bpmn2:defaultprocess.st</arg>
           </compilerArgs>
+          <release>11</release>
         </configuration>
       </plugin>
       <plugin>

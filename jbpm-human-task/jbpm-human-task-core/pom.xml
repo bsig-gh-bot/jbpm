@@ -83,12 +83,12 @@
     <dependency>
       <groupId>javax.mail</groupId>
       <artifactId>mail</artifactId>
-      <exclusions>
+      <!--exclusions>
         <exclusion>
           <groupId>javax.activation</groupId>
           <artifactId>activation</artifactId>
         </exclusion>
-      </exclusions>
+      </exclusions-->
     </dependency>
 
     <dependency>
