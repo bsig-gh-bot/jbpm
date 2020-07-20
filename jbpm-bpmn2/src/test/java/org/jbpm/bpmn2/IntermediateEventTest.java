@@ -2774,6 +2774,11 @@ public class IntermediateEventTest extends JbpmBpmn2TestCase {
 
             @Override
             public void beforeProcessStarted(ProcessStartedEvent event) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 instances.add(event.getProcessInstance().getId());
             }
             
@@ -2819,6 +2824,11 @@ public class IntermediateEventTest extends JbpmBpmn2TestCase {
 
             @Override
             public void beforeProcessStarted(ProcessStartedEvent event) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 instances.add(event.getProcessInstance().getId());
             }
             
@@ -2877,6 +2887,11 @@ public class IntermediateEventTest extends JbpmBpmn2TestCase {
 
             @Override
             public void beforeProcessStarted(ProcessStartedEvent event) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 instances.add(event.getProcessInstance().getId());
             }
             
