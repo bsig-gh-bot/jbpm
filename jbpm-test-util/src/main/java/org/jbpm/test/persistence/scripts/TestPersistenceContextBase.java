@@ -42,12 +42,16 @@ import org.jbpm.test.persistence.util.ProcessCreatorForHelp;
 import org.kie.api.KieBase;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.EnvironmentName;
+import org.kie.internal.KieInternalServices;
 import org.kie.internal.persistence.jpa.JPAKnowledgeService;
+import org.kie.internal.process.CorrelationAwareProcessRuntime;
+import org.kie.internal.process.CorrelationKey;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
 import org.kie.test.util.db.PoolingDataSourceWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static java.util.Collections.emptyMap;
 import static org.jbpm.test.persistence.scripts.DatabaseType.SQLSERVER;
 import static org.jbpm.test.persistence.scripts.DatabaseType.SQLSERVER2008;
 import static org.jbpm.test.persistence.scripts.DatabaseType.SYBASE;
@@ -181,14 +185,31 @@ public class TestPersistenceContextBase {
      *
      * @param processId Process identifier. This identifier is also used to generate KieBase
      *                  (process with this identifier is part of generated KieBase).
+     * @param businessKey Used to create a new process instance with a correlated key based on it.
      */
-    public void startAndPersistSomeProcess(final String processId) {
+    public void startAndPersistSomeProcess(final String processId, final String businessKey) {
         testIsInitialized();
         final StatefulKnowledgeSession session;
         final KieBase kbase = createKieBase(processId);
 
         session = JPAKnowledgeService.newStatefulKnowledgeSession(kbase, null, environment);
-        session.startProcess(processId);
+        if (businessKey != null && !businessKey.isEmpty()) {
+            CorrelationKey key = KieInternalServices.Factory.get().newCorrelationKeyFactory().newCorrelationKey(businessKey);
+            ((CorrelationAwareProcessRuntime)session).startProcess(processId, key, emptyMap());
+        } else {
+            session.startProcess(processId);
+        }
+
+    }
+
+    /**
+     * Starts and persists a basic simple process using current database entities.
+     *
+     * @param processId Process identifier. This identifier is also used to generate KieBase
+     *                  (process with this identifier is part of generated KieBase).
+     */
+    public void startAndPersistSomeProcess(final String processId) {
+        startAndPersistSomeProcess(processId, null);
     }
 
     /**

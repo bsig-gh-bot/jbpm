@@ -30,11 +30,14 @@ import org.jbpm.test.persistence.scripts.util.ScriptFilter.Option;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.jbpm.persistence.scripts.TestPersistenceContext.createAndInitContext;
 import static org.jbpm.test.persistence.scripts.PersistenceUnit.DB_QUARTZ_VALIDATE;
 import static org.jbpm.test.persistence.scripts.PersistenceUnit.DB_TESTING_VALIDATE;
@@ -96,6 +99,9 @@ public class DDLScriptsTest extends ScriptsBase {
 
     private Map<String, Object> oldEnvironment;
 
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
     @Before
     public void prepare() {
         oldEnvironment = new HashMap<>();
@@ -131,14 +137,39 @@ public class DDLScriptsTest extends ScriptsBase {
         executeScriptRunner(DB_DDL_SCRIPTS_RESOURCE_PATH, dropScript);
     }
 
-    protected void validateAndPersistProcess() {
+    /**
+     * Tests that DB schema is created properly using DDL scripts.
+     */
+    @Test
+    public void duplicatedCorrelationKeys() throws Exception {
+        try {
+            executeScriptRunner(DB_DDL_SCRIPTS_RESOURCE_PATH, createScript);
+            validateAndPersistProcess("my-business-key");
+            expectedException.expect(RuntimeException.class);
+            expectedException.expectMessage(containsString("my-business-key"));
+            validateAndPersistProcess("my-business-key");
+            validateQuartz();
+        } finally {
+            executeScriptRunner(DB_DDL_SCRIPTS_RESOURCE_PATH, dropScript);
+        }
+    }
+
+    protected void validateAndPersistProcess(String businessKey) {
         final TestPersistenceContext dbTestingContext = createAndInitContext(DB_TESTING_VALIDATE);
         try {
-            dbTestingContext.startAndPersistSomeProcess(TEST_PROCESS_ID);
+            if (businessKey != null && !businessKey.isEmpty()) {
+                dbTestingContext.startAndPersistSomeProcess(TEST_PROCESS_ID, businessKey);
+            } else {
+                dbTestingContext.startAndPersistSomeProcess(TEST_PROCESS_ID);
+            }
             Assert.assertTrue(dbTestingContext.getStoredProcessesCount() == 1);
         } finally {
             dbTestingContext.clean();
         }
+    }
+
+    protected void validateAndPersistProcess() {
+        validateAndPersistProcess(null);
     }
 
     protected void validateQuartz() {
