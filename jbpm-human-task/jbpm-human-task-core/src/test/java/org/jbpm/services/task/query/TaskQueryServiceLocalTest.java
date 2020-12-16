@@ -21,6 +21,7 @@ import javax.persistence.Persistence;
 
 import org.jbpm.services.task.HumanTaskServiceFactory;
 import org.jbpm.services.task.TaskQueryServiceBaseTest;
+import org.junit.Ignore;
 import org.kie.test.util.db.PoolingDataSourceWrapper;
 import org.junit.After;
 import org.junit.Before;

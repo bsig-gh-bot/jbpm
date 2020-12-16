@@ -22,13 +22,14 @@ import javax.persistence.Persistence;
 import org.drools.core.impl.EnvironmentFactory;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.EnvironmentName;
 import org.kie.internal.task.api.InternalTaskService;
 import org.kie.test.util.db.PoolingDataSourceWrapper;
 
 
-
+@Ignore
 public class LifeCycleLocalCommandBasedTest extends LifeCycleBaseTest {
 
 	private PoolingDataSourceWrapper pds;
@@ -52,14 +53,11 @@ public class LifeCycleLocalCommandBasedTest extends LifeCycleBaseTest {
 
 	@After
 	public void clean() {
-    	super.tearDown();
 		if (emf != null) {
 			emf.close();
-			emf = null;
 		}
 		if (pds != null) {
 			pds.close();
-			pds = null;
 		}
 	}
 }
