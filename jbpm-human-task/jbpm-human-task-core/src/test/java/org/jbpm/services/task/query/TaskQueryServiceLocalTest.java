@@ -27,7 +27,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.kie.internal.task.api.InternalTaskService;
 
-
+@Ignore
 public class TaskQueryServiceLocalTest extends TaskQueryServiceBaseTest {
 
 	private PoolingDataSourceWrapper pds;

@@ -29,7 +29,6 @@ import org.kie.internal.task.api.InternalTaskService;
 import org.kie.test.util.db.PoolingDataSourceWrapper;
 
 
-@Ignore
 public class LifeCycleLocalCommandBasedTest extends LifeCycleBaseTest {
 
 	private PoolingDataSourceWrapper pds;
