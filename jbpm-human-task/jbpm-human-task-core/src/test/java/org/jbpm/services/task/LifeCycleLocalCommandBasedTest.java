@@ -52,11 +52,14 @@ public class LifeCycleLocalCommandBasedTest extends LifeCycleBaseTest {
 
 	@After
 	public void clean() {
+    	super.tearDown();
 		if (emf != null) {
 			emf.close();
+			emf = null;
 		}
 		if (pds != null) {
 			pds.close();
+			pds = null;
 		}
 	}
 }
